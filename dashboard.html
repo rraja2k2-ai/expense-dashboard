@@ -293,7 +293,10 @@
       evt.currentTarget.classList.add('active');
 
       if (tabId === 'tabTrends') {
-        renderTrendAnalysisVisualizers();
+        // Delay execution slightly to allow DOM panels to expand before sizing canvas
+        setTimeout(() => {
+          renderTrendAnalysisVisualizers();
+        }, 50);
       }
     }
 
@@ -329,7 +332,7 @@
       const months = new Set();
       CORE_DATA_CACHE.headers.forEach(h => {
         if (h['Date']) {
-          const parts = h['Date'].split('/');
+          const parts = String(h['Date']).split('/');
           if (parts.length === 3) months.add(`${parts[2]}-${parts[1]}`); // Format: YYYY-MM
         }
       });
@@ -353,7 +356,7 @@
       // Isolate transactions matching selected timeframe scope
       const activeHeaders = CORE_DATA_CACHE.headers.filter(h => {
         if (currentScope === 'ALL') return true;
-        const parts = h['Date'].split('/');
+        const parts = String(h['Date']).split('/');
         return `${parts[2]}-${parts[1]}` === currentScope;
       });
 
@@ -363,11 +366,11 @@
     }
 
     /**
-     * Read the Accounts array directly to update liquid cards and handle multicurrency balances
+     * Read the Accounts array directly from meta to update balances
      */
     function processLiveAccountingSummaryCard() {
-      // Maps precisely to the meta.financialAccounts payload returned by your Apps Script
-      const accounts = CORE_DATA_CACHE.meta ? CORE_DATA_CACHE.meta.financialAccounts : (CORE_DATA_CACHE.financialAccounts || []);
+      // Binds strictly to your script's native output configuration wrappers
+      const accounts = CORE_DATA_CACHE.meta ? CORE_DATA_CACHE.meta.financialAccounts : [];
       const netWorthSGD = CORE_DATA_CACHE.meta ? CORE_DATA_CACHE.meta.netWorthSGD : 0;
       
       let savingsSgd = 0, savingsInr = 0;
@@ -391,7 +394,7 @@
           }
         } else if (group === 'Credit Card') {
           if (currency === 'SGD') {
-            debtSgd += balance; // Keeps track of outstanding negative balances
+            debtSgd += balance; // Aggregates outstanding balances
             listSgdDebts.push(name);
           }
         }
@@ -409,7 +412,7 @@
     }
 
     /**
-     * Constructs Matrix grid and triggers Soft-Neon Overbudget warnings when rules are exceeded
+     * Constructs Matrix grid and filters out Internal Transfers/CC Bill Payments from Expense counts
      */
     function renderMatrixGrid(filteredHeaders) {
       const budgetMap = CORE_DATA_CACHE.budgetMap || {};
@@ -418,23 +421,23 @@
 
       // 1. Identify distinct columns for subcategory aggregation matrix
       const dynamicMonths = [...new Set(filteredHeaders.map(h => {
-        const p = h['Date'].split('/');
+        const p = String(h['Date']).split('/');
         return `${p[2]}-${p[1]}`;
       }))].sort();
 
       // Clear header markup row back to standard defaults
       matrixHeader.innerHTML = `<th>Category Matrix</th>` + dynamicMonths.map(m => ` <th class="num-align">${m}</th>`).join('') + `<th class="num-align">Budget Limit</th>`;
 
-      // 2. Aggregate spending values grouping strictly by Category (Primary / Specific)
+      // 2. Aggregate spending values grouping strictly by Category
       let matrixStructure = {};
 
       filteredHeaders.forEach(h => {
-        // Skip double-counting internal wealth movements
-        const type = (h['Transaction Type'] || '').trim();
-        if (type === 'Credit Card Bill Pay' || type.toLowerCase() === 'transfer') return;
+        // FIXED FOR BRO: Securely filter out internal wealth movements to prevent double counting
+        const type = String(h['Transaction Type'] || '').trim().toLowerCase();
+        if (type === 'credit card bill pay' || type === 'transfer' || type === 'income') return;
 
         const receiptId = h['Receipt ID (Key)'];
-        const dateParts = h['Date'].split('/');
+        const dateParts = String(h['Date']).split('/');
         const monthStr = `${dateParts[2]}-${dateParts[1]}`;
         const associatedItems = CORE_DATA_CACHE.itemsByReceipt[receiptId] || [];
 
@@ -482,7 +485,7 @@
       let html = "";
 
       filteredHeaders.forEach(h => {
-        const type = (h['Transaction Type'] || '').trim();
+        const type = String(h['Transaction Type'] || '').trim();
         let badgeClass = 'badge-expense';
         if (type === 'Credit Card Bill Pay') badgeClass = 'badge-billpay';
         if (type.toLowerCase() === 'transfer') badgeClass = 'badge-transfer';
@@ -507,10 +510,11 @@
      */
     function renderTrendAnalysisVisualizers() {
       const headers = CORE_DATA_CACHE.headers;
+      if (!headers || headers.length === 0) return;
 
       // Extract distinct chronology labels
       const chronologicalMonths = [...new Set(headers.map(h => {
-        const p = h['Date'].split('/');
+        const p = String(h['Date']).split('/');
         return `${p[2]}-${p[1]}`;
       }))].sort();
 
@@ -518,7 +522,7 @@
       let trackingMerchants = {};
       chronologicalMonths.forEach(m => trackingDataExpenses[m] = 0);
 
-      // Extract default budget income profile or fallback if unassigned
+      // Extract budget income profile from meta or fallback to standard $12,700
       let fixedMonthlySalaryBaseline = 12700;
       if (CORE_DATA_CACHE.meta && CORE_DATA_CACHE.meta.fixedIncomeMap) {
         const salaryKey = Object.keys(CORE_DATA_CACHE.meta.fixedIncomeMap)[0];
@@ -526,10 +530,11 @@
       }
 
       headers.forEach(h => {
-        const type = (h['Transaction Type'] || '').trim();
-        if (type === 'Credit Card Bill Pay' || type.toLowerCase() === 'transfer') return;
+        // FIXED FOR BRO: Filter credit card bill payments, transfers, and income rows completely out of expense stats!
+        const type = String(h['Transaction Type'] || '').trim().toLowerCase();
+        if (type === 'credit card bill pay' || type === 'transfer' || type === 'income') return;
 
-        const p = h['Date'].split('/');
+        const p = String(h['Date']).split('/');
         const m = `${p[2]}-${p[1]}`;
         const amt = parseFloat(h['SGD Total Amount']) || 0;
         const vendor = h['Merchant'] || 'Unknown Vendor';
@@ -546,7 +551,7 @@
         return ((saved / fixedMonthlySalaryBaseline) * 100).toFixed(1);
       });
 
-      // 1. Savings Run Rate Chart Object Instance Creation
+      // 1. Savings Run Rate Chart
       if (instancesOfCharts['savingsTrend']) instancesOfCharts['savingsTrend'].destroy();
       instancesOfCharts['savingsTrend'] = new Chart(document.getElementById('chartSavingsTrend'), {
         type: 'line',
@@ -572,7 +577,7 @@
         }
       });
 
-      // 2. Vendor Analytics Bar Chart Layout Extraction
+      // 2. Vendor Analytics Bar Chart
       const topVendorsSorted = Object.entries(trackingMerchants).sort((a,b) => b[1] - a[1]).slice(0, 10);
       
       if (instancesOfCharts['merchantTrend']) instancesOfCharts['merchantTrend'].destroy();
