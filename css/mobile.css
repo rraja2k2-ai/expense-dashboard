@@ -1,0 +1,5 @@
+/* Responsive behavior preserved from the original dashboard. */
+@media(max-width: 900px) {
+  .visuals-layout { grid-template-columns: 1fr; }
+  select { max-width: 100%; }
+}

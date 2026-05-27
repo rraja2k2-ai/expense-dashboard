@@ -1,0 +1,10 @@
+/* Ledger and matrix table presentation. */
+.table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 4px; }
+.ledger-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; white-space: nowrap; }
+.ledger-table th { padding: 10px 8px; border-bottom: 2px solid var(--border); color: var(--text-secondary); font-size: 11px; text-transform: uppercase; }
+.ledger-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+.num-align { text-align: right; font-family: monospace; font-size: 13px; }
+
+.matrix-budget-header { color: var(--neon-rose); }
+.matrix-budget-cell { color: var(--neon-cyan); font-weight: 600; }
+.matrix-empty { text-align: center; color: var(--text-muted); }

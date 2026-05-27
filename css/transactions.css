@@ -1,0 +1,27 @@
+/* Transaction log, lazy loading rows, and item drilldown details. */
+.tx-list { display: flex; flex-direction: column; gap: 6px; }
+.tx-row-wrapper { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.tx-header-trigger { display: flex; justify-content: space-between; align-items: center; padding: 14px; cursor: pointer; min-height: 44px; }
+.tx-meta h4 { font-size: 14px; font-weight: 600; color: #fff; }
+.tx-meta p { font-size: 12px; color: var(--text-muted); }
+.tx-type-badge { font-size: 11px; font-weight: normal; }
+.tx-secondary { color: var(--text-secondary); }
+.tx-item-count { color: var(--neon-emerald); }
+.tx-amount { font-family: monospace; font-size: 15px; font-weight: 700; color: var(--neon-cyan); }
+.tx-item-total { font-weight: 600; color: var(--neon-cyan); }
+.tx-expanded-body { display: none; padding: 12px; background: rgba(10, 17, 40, 0.5); border-top: 1px solid var(--border); }
+.tx-expanded-body.open { display: block; }
+
+.load-more-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--surface-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 12px;
+  text-align: center;
+}

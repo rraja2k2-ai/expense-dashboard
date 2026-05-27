@@ -1,0 +1,41 @@
+/* KPI cards, badges, accordions, and privacy mask styles. */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.interactive-card { cursor: pointer; transition: all 0.2s; position: relative; }
+.interactive-card:hover { border-color: var(--neon-cyan); box-shadow: 0 0 12px var(--border-glow); }
+
+.kpi-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.kpi-value { font-size: 24px; font-weight: 700; margin: 6px 0; font-family: monospace; }
+.kpi-footer { font-size: 12px; color: var(--text-muted); }
+
+.metric-neutral { color: #fff; }
+.metric-positive { color: var(--neon-emerald); }
+.metric-negative { color: var(--neon-rose); }
+.metric-warning { color: var(--neon-amber); }
+.metric-accent { color: var(--neon-cyan); }
+
+.blurred-value { filter: blur(5px); cursor: pointer; transition: filter 0.15s ease-in-out; select: none; }
+.blurred-value:hover { filter: blur(2px); }
+.unblurred { filter: none !important; }
+
+.drawer {
+  display: none;
+  background: rgba(10, 17, 40, 0.6);
+  border-radius: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+
+.drawer.open { display: block; }
+
+.badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-cyan { background: rgba(0, 180, 216, 0.15); color: var(--neon-cyan); }
+.badge-emerald { background: rgba(6, 214, 160, 0.15); color: var(--neon-emerald); }
+.badge-rose { background: rgba(239, 71, 111, 0.15); color: var(--neon-rose); }

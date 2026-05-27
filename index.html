@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Executive Personal Ledger</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/tables.css">
+<link rel="stylesheet" href="css/charts.css">
+<link rel="stylesheet" href="css/transactions.css">
+<link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="app-header">
+    <div class="app-title">
+      <h1>Financial Portfolio Dashboard</h1>
+      <p id="systemSyncTimestamp">Connecting to script ledger runtime...</p>
+    </div>
+    <div class="header-controls">
+      <span class="live-status">● Cloud Synced</span>
+      <select id="periodSelector" onchange="runOperationalPipeline()"><option value="ALL">All Available Timeframes</option></select>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="card">
+      <div class="kpi-title">Consolidated Net Worth</div>
+      <div id="metricNetWorth" class="kpi-value metric-neutral">$0.00</div>
+      <div class="kpi-footer"><span class="badge badge-cyan">SGD Aggregated</span></div>
+    </div>
+    <div class="card interactive-card" onclick="togglePrivacyMask('metricIncome')">
+      <div class="kpi-title" id="titleIncomeLabel">Income Baseline 👁 </div>
+      <div id="metricIncome" class="kpi-value blurred-value metric-positive">$0.00</div>
+      <div class="kpi-footer">Tap value to safely view or hide</div>
+    </div>
+    <div class="card">
+      <div class="kpi-title" id="titleExpenseLabel">Outflows Realized</div>
+      <div id="metricExpense" class="kpi-value metric-negative">$0.00</div>
+      <div class="kpi-footer">Selected Statement Period</div>
+    </div>
+    <div class="card">
+      <div class="kpi-title">Net Margin Savings</div>
+      <div id="metricSavingsRate" class="kpi-value metric-warning">$0.00</div>
+      <div id="subSavingsRateBadge"><span class="badge badge-cyan">0% Margin</span></div>
+    </div>
+  </div>
+
+  <div class="section-title section-title-tight">Liquid Asset Capital Cash Accounts</div>
+  <div class="kpi-grid">
+    <div class="card interactive-card" onclick="toggleAccordionDrawer('savingsSgdDrawer')">
+      <div class="kpi-title">Singapore Cash & Savings ▾</div>
+      <div id="valSavingsSgd" class="kpi-value metric-positive">$0.00 SGD</div>
+      <div class="kpi-footer">Tap to check native bank lines</div>
+      <div id="savingsSgdDrawer" class="drawer"><div class="table-responsive" id="tableSavingsSgd"></div></div>
+    </div>
+    <div class="card interactive-card" onclick="toggleAccordionDrawer('savingsInrDrawer')">
+      <div class="kpi-title">India Cash & Savings ▾</div>
+      <div id="valSavingsInr" class="kpi-value metric-positive">₹0.00 INR</div>
+      <div class="kpi-footer">Tap to check native bank lines</div>
+      <div id="savingsInrDrawer" class="drawer"><div class="table-responsive" id="tableSavingsInr"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title section-title-tight">Credit Cards Outstanding Liabilities</div>
+  <div class="kpi-grid">
+    <div class="card interactive-card" onclick="toggleAccordionDrawer('liabilitySgdDrawer')">
+      <div class="kpi-title">Singapore Card Liabilities ▾</div>
+      <div id="valLiabilitySgd" class="kpi-value metric-negative">$0.00 SGD</div>
+      <div class="kpi-footer">Tap to track card outstanding</div>
+      <div id="liabilitySgdDrawer" class="drawer"><div class="table-responsive" id="tableLiabilitySgd"></div></div>
+    </div>
+    <div class="card interactive-card" onclick="toggleAccordionDrawer('liabilityInrDrawer')">
+      <div class="kpi-title">India Card Liabilities ▾</div>
+      <div id="valLiabilityInr" class="kpi-value metric-negative">₹0.00 INR</div>
+      <div class="kpi-footer">Tap to track card outstanding</div>
+      <div id="liabilityInrDrawer" class="drawer"><div class="table-responsive" id="tableLiabilityInr"></div></div>
+    </div>
+  </div>
+
+  <div class="visuals-layout">
+    <div class="card">
+      <div class="section-title">Top 10 Expense Run Rates vs Monthly Targets</div>
+      <div class="chart-frame"><canvas id="chartCanvasSubcategories"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Primary Group Allocations</div>
+      <div class="chart-frame"><canvas id="chartCanvasMacroShare"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Top 10 Subcategories Rolling 6-Month Expense Matrix vs Monthly Budget</div>
+    <div class="table-responsive">
+      <table class="ledger-table" id="matrixHistoricalSixMonthTable">
+        <thead><tr id="matrixHeaderTargetRow"></tr></thead>
+        <tbody id="matrixBodyTargetRow"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Itemized Statements Log</div>
+    <div id="receiptsLogList" class="tx-list"></div>
+    <button id="loadMoreTransactionsBtn" class="load-more-btn is-hidden" onclick="loadMoreReceipts()">Load Older Transactions</button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/metrics.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/matrix.js"></script>
+<script src="js/transactions.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

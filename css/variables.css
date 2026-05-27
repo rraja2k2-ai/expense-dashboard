@@ -1,0 +1,15 @@
+/* Design tokens preserved from the original dashboard. */
+:root {
+  --bg: #0a1128;
+  --surface: #1c2541;
+  --surface-accent: #3a506b;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(0, 180, 216, 0.2);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --neon-cyan: #00b4d8;
+  --neon-emerald: #06d6a0;
+  --neon-rose: #ef476f;
+  --neon-amber: #ffd166;
+}
